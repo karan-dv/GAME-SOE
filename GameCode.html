@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TEAM BUILDER SIMULATOR - White | Black | Yellow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FFFFFF;
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            padding: 20px;
+        }
+
+        /* Screen Navigation */
+        .screen {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid #F5F5F5;
+            transition: all 0.3s ease;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: #000000;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 3rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #FFFFFF;
+            font-family: inherit;
+        }
+        .btn-primary:hover {
+            background: #FFD700;
+            color: #000000;
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-secondary {
+            background: #F5F5F5;
+            border: 2px solid #000000;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #000000;
+        }
+
+        /* Rules Page */
+        .rules-container {
+            text-align: center;
+        }
+        .rules-header h1 {
+            font-size: 2.2rem;
+            color: #000000;
+            margin-bottom: 1rem;
+        }
+        .rules-header p {
+            color: #666666;
+        }
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .rule-card {
+            background: #FFFFFF;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border-left: 4px solid #FFD700;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #EEEEEE;
+        }
+        .rule-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .rule-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 0.5rem;
+        }
+        .rule-text {
+            color: #555555;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .start-btn {
+            margin-top: 1rem;
+            font-size: 1.3rem;
+            padding: 1rem 3rem;
+        }
+
+        /* Game UI - White/Black/Yellow Theme */
+        .leader-dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            background: #F8F8F8;
+            border-radius: 1.5rem;
+            padding: 1rem 1.5rem;
+            border: 1px solid #EEEEEE;
+        }
+        .leader-stat {
+            text-align: center;
+            flex: 1;
+            min-width: 90px;
+        }
+        .leader-stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #666666;
+            font-weight: 600;
+        }
+        .leader-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #000000;
+        }
+        .leader-stat-bar {
+            background: #E0E0E0;
+            height: 6px;
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .leader-stat-fill {
+            height: 100%;
+            background: #FFD700;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .game-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        .team-section {
+            flex: 2;
+            min-width: 320px;
+            background: #F8F8F8;
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            border: 1px solid #EEEEEE;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #FFD700;
+            padding-bottom: 0.5rem;
+        }
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .team-card {
+            background: #FFFFFF;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            border-left: 4px solid #FFD700;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #F0F0F0;
+        }
+        .member-name {
+            font-weight: bold;
+            color: #000000;
+        }
+        .member-role {
+            font-size: 0.7rem;
+            background: #F5F5F5;
+            padding: 0.2rem 0.6rem;
+            border-radius: 2rem;
+            color: #666666;
+        }
+        .member-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin: 0.5rem 0;
+        }
+        .trait {
+            font-size: 0.65rem;
+            background: #F5F5F5;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            color: #555555;
+        }
+        .remove-btn {
+            background: #000000;
+            border: none;
+            color: #FFFFFF;
+            padding: 0.3rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+            width: 100%;
+            margin-top: 0.5rem;
+            transition: 0.2s;
+        }
+        .remove-btn:hover {
+            background: #FFD700;
+            color: #000000;
+        }
+        .candidates-section {
+            flex: 1.3;
+            min-width: 280px;
+            background: #F8F8F8;
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            border: 1px solid #EEEEEE;
+        }
+        .candidates-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .candidate-card {
+            background: #FFFFFF;
+            border-radius: 1rem;
+            padding: 0.9rem;
+            cursor: pointer;
+            border: 1px solid #E0E0E0;
+            transition: 0.2s;
+        }
+        .candidate-card:hover {
+            background: #FFF9E6;
+            border-color: #FFD700;
+            transform: translateX(5px);
+        }
+        .recruit-btn {
+            background: #FFD700;
+            border: none;
+            padding: 0.3rem;
+            border-radius: 1rem;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            color: #000000;
+            transition: 0.2s;
+        }
+        .recruit-btn:hover {
+            background: #000000;
+            color: #FFD700;
+        }
+        .action-panel {
+            margin-top: 1.5rem;
+            background: #FFFFFF;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            border: 1px solid #EEEEEE;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .action-btn {
+            background: #000000;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #FFFFFF;
+            transition: 0.2s;
+        }
+        .action-btn:hover {
+            background: #FFD700;
+            color: #000000;
+        }
+        .reset-btn {
+            background: #666666;
+        }
+        .reset-btn:hover {
+            background: #FFD700;
+            color: #000000;
+        }
+        .finish-btn {
+            background: #FFD700;
+            color: #000000;
+        }
+        .finish-btn:hover {
+            background: #000000;
+            color: #FFD700;
+        }
+        .event-feedback {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background: #F5F5F5;
+            border-radius: 1rem;
+            color: #333333;
+            text-align: center;
+            border-left: 3px solid #FFD700;
+        }
+
+        /* Results Page */
+        .results-container {
+            text-align: center;
+        }
+        .results-header {
+            margin-bottom: 2rem;
+        }
+        .results-header h1 {
+            font-size: 2rem;
+            color: #000000;
+        }
+        .final-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .final-stat-card {
+            background: #F8F8F8;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            border: 1px solid #EEEEEE;
+        }
+        .final-stat-card h3 {
+            color: #666666;
+            font-size: 0.9rem;
+        }
+        .final-stat-card div {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #000000;
+        }
+        .leader-rating {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            color: #FFD700;
+            text-shadow: 1px 1px 0px #000000;
+        }
+        .feedback-summary {
+            background: #F8F8F8;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+            border-left: 5px solid #FFD700;
+        }
+        .play-again-btn {
+            margin-top: 1rem;
+        }
+        .game-header h2 {
+            color: #000000;
+        }
+        .game-header p {
+            color: #666666;
+        }
+    </style>
+</head>
+<body>
+    <!-- RULES SCREEN -->
+    <div id="rulesScreen" class="screen">
+        <div class="rules-container">
+            <div class="rules-header">
+                <h1>⚫ TEAM BUILDER SIMULATOR ⚪</h1>
+                <p style="color:#666666;">Master the Art of Leadership Through Team Building</p>
+            </div>
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-icon">👥</div>
+                    <div class="rule-title">Recruit Diverse Talent</div>
+                    <div class="rule-text">Choose from 10 unique candidates with different traits, specialties, and backstories. Each brings unique bonuses to your team's performance.</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">📊</div>
+                    <div class="rule-title">5 Leadership Metrics</div>
+                    <div class="rule-text">Your team affects: SYNERGY, INNOVATION, TRUST, RESILIENCE, PRODUCTIVITY. Keep them high to succeed!</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">🎯</div>
+                    <div class="rule-title">Team Size Limit</div>
+                    <div class="rule-text">Maximum 5 team members. Choose wisely — diversity and complementary skills boost your stats.</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">🤝</div>
+                    <div class="rule-title">Leadership Actions</div>
+                    <div class="rule-text">Use TEAM MEETING (boosts Synergy & Trust) and MENTORSHIP (boosts Resilience & Innovation) to grow your leadership.</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">🏆</div>
+                    <div class="rule-title">Win Condition</div>
+                    <div class="rule-text">Build a team of 5 members and use leadership actions to maximize all 5 metrics. Click "FINISH JOURNEY" when ready to see your final leadership rating!</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">🔄</div>
+                    <div class="rule-title">Remove & Replace</div>
+                    <div class="rule-text">You can remove members anytime to try different combinations. Experiment to find the perfect team synergy.</div>
+                </div>
+            </div>
+            <button class="btn-primary start-btn" id="startGameBtn">🚀 START YOUR LEADERSHIP JOURNEY →</button>
+        </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="gameScreen" class="screen hidden">
+        <div class="game-header" style="text-align:center; margin-bottom:1rem;">
+            <h2 style="color:#000000;">👑 BUILD YOUR DREAM TEAM</h2>
+            <p style="color:#666666;">Recruit 5 members | Use Actions | Click FINISH when ready</p>
+        </div>
+
+        <div class="leader-dashboard">
+            <div class="leader-stat"><div class="leader-stat-label">🎯 SYNERGY</div><div class="leader-stat-value" id="synergyVal">65</div><div class="leader-stat-bar"><div class="leader-stat-fill" id="synergyFill"></div></div></div>
+            <div class="leader-stat"><div class="leader-stat-label">💡 INNOVATION</div><div class="leader-stat-value" id="innovationVal">60</div><div class="leader-stat-bar"><div class="leader-stat-fill" id="innovationFill"></div></div></div>
+            <div class="leader-stat"><div class="leader-stat-label">🤝 TRUST</div><div class="leader-stat-value" id="trustVal">70</div><div class="leader-stat-bar"><div class="leader-stat-fill" id="trustFill"></div></div></div>
+            <div class="leader-stat"><div class="leader-stat-label">⚡ RESILIENCE</div><div class="leader-stat-value" id="resilienceVal">65</div><div class="leader-stat-bar"><div class="leader-stat-fill" id="resilienceFill"></div></div></div>
+            <div class="leader-stat"><div class="leader-stat-label">📈 PRODUCTIVITY</div><div class="leader-stat-value" id="productivityVal">68</div><div class="leader-stat-bar"><div class="leader-stat-fill" id="productivityFill"></div></div></div>
+        </div>
+
+        <div class="game-grid">
+            <div class="team-section">
+                <div class="section-title">👥 YOUR TEAM <span id="teamCount">(0/5 members)</span></div>
+                <div id="rosterContainer" class="roster-grid"><div style="color:#999999; text-align:center; padding:2rem;">No team members yet. Recruit from candidates!</div></div>
+                <div class="action-panel">
+                    <div class="action-buttons">
+                        <button class="action-btn" id="teamMeetingBtn">🤝 TEAM MEETING</button>
+                        <button class="action-btn" id="mentorshipBtn">🌟 MENTORSHIP</button>
+                        <button class="action-btn reset-btn" id="resetGameBtn">🔄 RESET</button>
+                        <button class="action-btn finish-btn" id="finishGameBtn">🏁 FINISH JOURNEY</button>
+                    </div>
+                    <div id="eventFeedback" class="event-feedback">✨ Click on candidates to recruit. Lead your team to greatness!</div>
+                </div>
+            </div>
+            <div class="candidates-section">
+                <div class="section-title">🌟 AVAILABLE CANDIDATES</div>
+                <div id="candidatesContainer" class="candidates-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div id="resultsScreen" class="screen hidden">
+        <div class="results-container">
+            <div class="results-header">
+                <h1>🏆 LEADERSHIP EVALUATION</h1>
+                <p style="color:#666666;">Your journey as a team builder is complete</p>
+            </div>
+            <div class="final-stats" id="finalStatsContainer"></div>
+            <div class="leader-rating" id="ratingText"></div>
+            <div class="feedback-summary" id="detailedFeedback"></div>
+            <button class="btn-primary play-again-btn" id="playAgainBtn">🔄 PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <script>
+        // CANDIDATES DATA
+        const candidatesPool = [
+            { id: 0, name: "Aisha Chen", role: "Creative Director", traits: ["Visionary", "Empathetic", "Risk-taker"], specialty: "Innovation", synergyBonus: 5, innovationBonus: 12, trustBonus: 4, resilienceBonus: 1, productivityBonus: 2, backstory: "Award-winning designer, champions inclusive creativity" },
+            { id: 1, name: "Marcus Okafor", role: "Engineering Lead", traits: ["Analytical", "Mentor", "Detail-oriented"], specialty: "Structure", synergyBonus: 6, innovationBonus: 3, trustBonus: 7, productivityBonus: 8, resilienceBonus: 4, backstory: "Built scalable systems for global startups" },
+            { id: 2, name: "Priya Kapoor", role: "Data Strategist", traits: ["Curious", "Ethical", "Problem-solver"], specialty: "Insights", synergyBonus: 4, innovationBonus: 9, trustBonus: 5, productivityBonus: 7, resilienceBonus: 3, backstory: "Uses data to drive human-centric decisions" },
+            { id: 3, name: "Liam O'Connor", role: "Community Manager", traits: ["Charismatic", "Empathetic", "Conflict-resolver"], specialty: "Trust", synergyBonus: 10, innovationBonus: 2, trustBonus: 12, productivityBonus: 3, resilienceBonus: 5, backstory: "Built thriving communities from scratch" },
+            { id: 4, name: "Yuki Tanaka", role: "Agile Coach", traits: ["Adaptable", "Patient", "Systems-thinker"], specialty: "Resilience", synergyBonus: 7, innovationBonus: 4, trustBonus: 6, productivityBonus: 5, resilienceBonus: 10, backstory: "Transformed toxic teams into high-performers" },
+            { id: 5, name: "Carlos Mendez", role: "Product Visionary", traits: ["Bold", "User-obsessed", "Strategic"], specialty: "Innovation", synergyBonus: 5, innovationBonus: 14, trustBonus: 2, productivityBonus: 6, resilienceBonus: 2, backstory: "Launched 3 market-leading products" },
+            { id: 6, name: "Fatima Al-Rashid", role: "Operations Expert", traits: ["Organized", "Calm-under-pressure", "Inclusive"], specialty: "Productivity", synergyBonus: 4, innovationBonus: 2, trustBonus: 6, productivityBonus: 12, resilienceBonus: 5, backstory: "Streamlined operations for NGOs worldwide" },
+            { id: 7, name: "Ethan Wright", role: "Wellness Lead", traits: ["Empathetic", "Listener", "Resilient"], specialty: "Trust & Resilience", synergyBonus: 8, innovationBonus: 1, trustBonus: 10, productivityBonus: 3, resilienceBonus: 9, backstory: "Pioneered mental health programs in tech" },
+            { id: 8, name: "Nina Kowalski", role: "Innovation Catalyst", traits: ["Curious", "Experimenter", "Collaborative"], specialty: "Innovation", synergyBonus: 6, innovationBonus: 13, trustBonus: 3, productivityBonus: 4, resilienceBonus: 4, backstory: "Led hackathons that generated patents" },
+            { id: 9, name: "David Kim", role: "Conflict Mediator", traits: ["Diplomatic", "Wise", "Calm"], specialty: "Synergy", synergyBonus: 12, innovationBonus: 2, trustBonus: 8, productivityBonus: 3, resilienceBonus: 6, backstory: "Resolved 50+ team disputes successfully" }
+        ];
+
+        let team = [];
+        let availableCandidates = [...candidatesPool];
+        let leaderStats = { synergy: 65, innovation: 60, trust: 70, resilience: 65, productivity: 68 };
+        let gameActive = true;
+
+        function clampStats() {
+            for(let key in leaderStats) {
+                if(leaderStats[key] > 100) leaderStats[key] = 100;
+                if(leaderStats[key] < 0) leaderStats[key] = 0;
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('synergyVal').innerText = leaderStats.synergy;
+            document.getElementById('innovationVal').innerText = leaderStats.innovation;
+            document.getElementById('trustVal').innerText = leaderStats.trust;
+            document.getElementById('resilienceVal').innerText = leaderStats.resilience;
+            document.getElementById('productivityVal').innerText = leaderStats.productivity;
+            document.getElementById('synergyFill').style.width = leaderStats.synergy + '%';
+            document.getElementById('innovationFill').style.width = leaderStats.innovation + '%';
+            document.getElementById('trustFill').style.width = leaderStats.trust + '%';
+            document.getElementById('resilienceFill').style.width = leaderStats.resilience + '%';
+            document.getElementById('productivityFill').style.width = leaderStats.productivity + '%';
+            document.getElementById('teamCount').innerHTML = `(${team.length}/5 members)`;
+        }
+
+        function recalcTeamStats() {
+            if (team.length === 0) {
+                leaderStats = { synergy: 65, innovation: 60, trust: 70, resilience: 65, productivity: 68 };
+                clampStats();
+                updateUI();
+                return;
+            }
+            let totalSynergy = 0, totalInnovation = 0, totalTrust = 0, totalResilience = 0, totalProductivity = 0;
+            team.forEach(m => {
+                totalSynergy += m.synergyBonus;
+                totalInnovation += m.innovationBonus;
+                totalTrust += m.trustBonus;
+                totalResilience += m.resilienceBonus;
+                totalProductivity += m.productivityBonus;
+            });
+            let allTraits = team.flatMap(m => m.traits);
+            let uniqueTraits = new Set(allTraits);
+            let diversityBonus = Math.min(15, uniqueTraits.size * 1.5);
+            let sizeBonus = team.length * 2;
+            
+            leaderStats.synergy = Math.min(100, Math.floor(50 + totalSynergy * 0.7 + diversityBonus + sizeBonus));
+            leaderStats.innovation = Math.min(100, Math.floor(45 + totalInnovation * 0.8 + (uniqueTraits.has("Risk-taker") ? 5 : 0) + (team.length >= 3 ? 4 : 0)));
+            leaderStats.trust = Math.min(100, Math.floor(55 + totalTrust * 0.7 + (team.some(m => m.specialty.includes("Trust")) ? 6 : 0)));
+            leaderStats.resilience = Math.min(100, Math.floor(50 + totalResilience * 0.6 + (team.length >= 4 ? 5 : 0)));
+            leaderStats.productivity = Math.min(100, Math.floor(52 + totalProductivity * 0.7 + (team.length >= 3 ? 3 : 0)));
+            clampStats();
+            updateUI();
+        }
+
+        function showFeedback(msg) {
+            const fbDiv = document.getElementById('eventFeedback');
+            if(fbDiv) {
+                fbDiv.innerHTML = `💬 ${msg}`;
+                setTimeout(() => { if(document.getElementById('eventFeedback')) fbDiv.innerHTML = `✨ ${msg.substring(0,50)}...`; }, 2000);
+            }
+        }
+
+        function renderRoster() {
+            const container = document.getElementById('rosterContainer');
+            if (!container) return;
+            if (team.length === 0) { container.innerHTML = '<div style="color:#999999; text-align:center; padding:2rem;">✨ No team members yet. Recruit diverse talent!</div>'; return; }
+            container.innerHTML = team.map((member, idx) => `
+                <div class="team-card">
+                    <div style="display:flex; justify-content:space-between;"><span class="member-name">${member.name}</span><span class="member-role">${member.role}</span></div>
+                    <div class="member-traits">${member.traits.map(t => `<span class="trait">${t}</span>`).join('')}</div>
+                    <button class="remove-btn" data-idx="${idx}">❌ Remove</button>
+                </div>
+            `).join('');
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(btn.dataset.idx);
+                    if (!isNaN(idx) && team[idx]) {
+                        const removed = team.splice(idx, 1)[0];
+                        availableCandidates.push(removed);
+                        availableCandidates.sort((a,b) => a.id - b.id);
+                        renderCandidates();
+                        renderRoster();
+                        recalcTeamStats();
+                        showFeedback(`Removed ${removed.name}. They return to candidates.`);
+                    }
+                });
+            });
+        }
+
+        function renderCandidates() {
+            const container = document.getElementById('candidatesContainer');
+            if (!container) return;
+            if (availableCandidates.length === 0) { container.innerHTML = '<div style="text-align:center; padding:2rem; color:#FFD700; font-weight:bold;">🌟 All candidates recruited!</div>'; return; }
+            container.innerHTML = availableCandidates.map(c => `
+                <div class="candidate-card">
+                    <div style="display:flex; justify-content:space-between;"><strong style="color:#000000;">${c.name}</strong> <span style="font-size:0.7rem; color:#666666;">${c.role}</span></div>
+                    <div class="member-traits">${c.traits.map(t => `<span class="trait">${t}</span>`).join('')}</div>
+                    <button class="recruit-btn" data-id="${c.id}">➕ RECRUIT</button>
+                </div>
+            `).join('');
+            document.querySelectorAll('.recruit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(btn.dataset.id);
+                    const candidate = availableCandidates.find(c => c.id === id);
+                    if (candidate && team.length < 5) {
+                        team.push({...candidate});
+                        availableCandidates = availableCandidates.filter(c => c.id !== id);
+                        renderCandidates();
+                        renderRoster();
+                        recalcTeamStats();
+                        showFeedback(`🎉 ${candidate.name} joined! ${candidate.specialty} expert added.`);
+                    } else if (team.length >= 5) showFeedback("⚠️ Team is full! Remove a member first.");
+                });
+            });
+        }
+
+        function teamMeeting() {
+            if (team.length === 0) { showFeedback("⚠️ No team members to meet with!"); return; }
+            leaderStats.synergy = Math.min(100, leaderStats.synergy + 5 + Math.floor(team.length * 1.2));
+            leaderStats.trust = Math.min(100, leaderStats.trust + 6);
+            leaderStats.productivity = Math.min(100, leaderStats.productivity + 2);
+            clampStats(); updateUI(); recalcTeamStats();
+            showFeedback(`🤝 Team Meeting! Synergy ↑, Trust ↑. Team feels connected.`);
+        }
+
+        function mentorshipSession() {
+            if (team.length === 0) { showFeedback("⚠️ No team to mentor!"); return; }
+            leaderStats.resilience = Math.min(100, leaderStats.resilience + 7);
+            leaderStats.innovation = Math.min(100, leaderStats.innovation + 6);
+            leaderStats.trust = Math.min(100, leaderStats.trust + 3);
+            clampStats(); updateUI(); recalcTeamStats();
+            showFeedback(`🌟 Mentorship Session! Resilience ↑, Innovation ↑.`);
+        }
+
+        function finishGame() {
+            gameActive = false;
+            document.getElementById('gameScreen').classList.add('hidden');
+            showResults();
+        }
+
+        function showResults() {
+            const avg = (leaderStats.synergy + leaderStats.innovation + leaderStats.trust + leaderStats.resilience + leaderStats.productivity) / 5;
+            let rating = "", description = "";
+            if (avg >= 85) { rating = "🏅 LEGENDARY LEADER"; description = "You've built an exceptional team and demonstrated masterful leadership. Your ability to balance diverse talents, foster trust, and drive innovation sets a benchmark. Teams would follow you anywhere!"; }
+            else if (avg >= 70) { rating = "🌟 INSPIRING LEADER"; description = "Great work! Your team thrives under your guidance. You understand the core of leadership: empowering others while maintaining vision. Keep growing!"; }
+            else if (avg >= 55) { rating = "📈 CAPABLE MANAGER"; description = "Solid foundation! You're building leadership skills. Focus on deepening trust and embracing more mentorship to unlock higher synergy."; }
+            else { rating = "🌱 ASPIRING LEADER"; description = "Your journey has begun. Leadership is a practice — keep experimenting with team composition and leadership actions to unlock greater potential."; }
+            
+            const finalContainer = document.getElementById('finalStatsContainer');
+            finalContainer.innerHTML = `
+                <div class="final-stat-card"><h3>🎯 Synergy</h3><div>${leaderStats.synergy}</div></div>
+                <div class="final-stat-card"><h3>💡 Innovation</h3><div>${leaderStats.innovation}</div></div>
+                <div class="final-stat-card"><h3>🤝 Trust</h3><div>${leaderStats.trust}</div></div>
+                <div class="final-stat-card"><h3>⚡ Resilience</h3><div>${leaderStats.resilience}</div></div>
+                <div class="final-stat-card"><h3>📈 Productivity</h3><div>${leaderStats.productivity}</div></div>
+            `;
+            document.getElementById('ratingText').innerHTML = `${rating}<br><span style="font-size:1rem; color:#666666;">Overall Score: ${Math.floor(avg)}/100</span>`;
+            document.getElementById('detailedFeedback').innerHTML = `
+                <strong>📊 TEAM COMPOSITION:</strong> ${team.length} members recruited.<br>
+                <strong>🏆 LEADERSHIP INSIGHT:</strong> ${description}<br><br>
+                <strong>💡 Key Leadership Qualities Demonstrated:</strong><br>
+                • ${leaderStats.trust > 70 ? "High Trust — psychological safety established" : "Trust building is your next frontier"}<br>
+                • ${leaderStats.innovation > 70 ? "Innovation mindset — you embrace change" : "Encourage more creative risk-taking"}<br>
+                • ${leaderStats.synergy > 70 ? "Excellent synergy — diversity leveraged" : "Work on team cohesion exercises"}<br>
+            `;
+            document.getElementById('resultsScreen').classList.remove('hidden');
+        }
+
+        function resetGame() {
+            team = [];
+            availableCandidates = [...candidatesPool];
+            leaderStats = { synergy: 65, innovation: 60, trust: 70, resilience: 65, productivity: 68 };
+            gameActive = true;
+            clampStats();
+            renderCandidates();
+            renderRoster();
+            recalcTeamStats();
+            showFeedback("Game reset! Start building your dream team.");
+        }
+
+        // Navigation
+        document.getElementById('startGameBtn').addEventListener('click', () => {
+            document.getElementById('rulesScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            resetGame();
+        });
+        document.getElementById('finishGameBtn').addEventListener('click', finishGame);
+        document.getElementById('teamMeetingBtn').addEventListener('click', teamMeeting);
+        document.getElementById('mentorshipBtn').addEventListener('click', mentorshipSession);
+        document.getElementById('resetGameBtn').addEventListener('click', resetGame);
+        document.getElementById('playAgainBtn').addEventListener('click', () => {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('rulesScreen').classList.remove('hidden');
+            resetGame();
+        });
+
+        // Initial render for game
+        renderCandidates();
+        renderRoster();
+        recalcTeamStats();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TEAM BUILDER SIMULATOR - White | Black | Yellow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FFFFFF;
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            padding: 20px;
+        }
+
+        /* Screen Navigation */
+        .screen {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid #F5F5F5;
+            transition: all 0.3s ease;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: #000000;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 3rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #FFFFFF;
+            font-family: inherit;
+        }
+        .btn-primary:hover {
+            background: #FFD700;
+            color: #000000;
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-secondary {
+            background: #F5F5F5;
+            border: 2px solid #000000;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #000000;
+        }
+
+        /* Rules Page */
+        .rules-container {
+            text-align: center;
+        }
+        .rules-header h1 {
+            font-size: 2.2rem;
+            color: #000000;
+            margin-bottom: 1rem;
+        }
+        .rules-header p {
+            color: #666666;
+        }
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .rule-card {
+            background: #FFFFFF;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border-left: 4px solid #FFD700;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #EEEEEE;
+        }
+        .rule-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .rule-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 0.5rem;
+        }
+        .rule-text {
+            color: #555555;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .start-btn {
+            margin-top: 1rem;
+            font-size: 1.3rem;
+            padding: 1rem 3rem;
+        }
+
+        /* Game UI - White/Black/Yellow Theme */
+        .leader-dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            background: #F8F8F8;
+            border-radius: 1.5rem;
+            padding: 1rem 1.5rem;
+            border: 1px solid #EEEEEE;
+        }
+        .leader-stat {
+            text-align: center;
+            flex: 1;
+            min-width: 90px;
+        }
+        .leader-stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #666666;
+            font-weight: 600;
+        }
+        .leader-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #000000;
+        }
+        .leader-stat-bar {
+            background: #E0E0E0;
+            height: 6px;
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .leader-stat-fill {
+            height: 100%;
+            background: #FFD700;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .game-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        .team-section {
+            flex: 2;
+            min-width: 320px;
+            background: #F8F8F8;
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            border: 1px solid #EEEEEE;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #FFD700;
+            padding-bottom: 0.5rem;
+        }
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .team-card {
+            background: #FFFFFF;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            border-left: 4px solid #FFD700;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #F0F0F0;
+        }
+        .member-name {
+            font-weight: bold;
+            color: #000000;
+        }
+        .member-role {
+            font-size: 0.7rem;
+            background: #F5F5F5;
+            padding: 0.2rem 0.6rem;
+            border-radius: 2rem;
+            color: #666666;
+        }
+        .member-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin: 0.5rem 0;
+        }
+        .trait {
+            font-size: 0.65rem;
+            background: #F5F5F5;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            color: #555555;
+        }
+        .remove-btn {
+            background: #000000;
+            border: none;
+            color: #FFFFFF;
+            padding: 0.3rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+            width: 100%;
+            margin-top: 0.5rem;
+            transition: 0.2s;
+        }
+        .remove-btn:hover {
+            background: #FFD700;
+            color: #000000;
+        }
+        .candidates-section {
+            flex: 1.3;
+            min-width: 280px;
+            background: #F8F8F8;
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            border: 1px solid #EEEEEE;
+        }
+        .candidates-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .candidate-card {
+            background: #FFFFFF;
+            border-radius: 1rem;
+            padding: 0.9rem;
+            cursor: pointer;
+            border: 1px solid #E0E0E0;
+            transition: 0.2s;
+        }
+        .candidate-card:hover {
+            background: #FFF9E6;
+            border-color: #FFD700;
+            transform: translateX(5px);
+        }
+        .recruit-btn {
+            background: #FFD700;
+            border: none;
+            padding: 0.3rem;
+            border-radius: 1rem;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            color: #000000;
+            transition: 0.2s;
+        }
+        .recruit-btn:hover {
+            background: #000000;
+            color: #FFD700;
+        }
+        .action-panel {
+            margin-top: 1.5rem;
+            background: #FFFFFF;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            border: 1px solid #EEEEEE;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .action-btn {
+            background: #000000;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #FFFFFF;
+            transition: 0.2s;
+        }
+        .action-btn:hover {
+            background: #FFD700;
+            color: #000000;
+        }
+        .reset-btn {
+            background: #666666;
+        }
+        .reset-btn:hover {
+            background: #FFD700;
+            color: #000000;
+        }
+        .finish-btn {
+            background: #FFD700;
+            color: #000000;
+        }
+        .finish-btn:hover {
+            background: #000000;
+            color: #FFD700;
+        }
+        .event-feedback {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background: #F5F5F5;
+            border-radius: 1rem;
+            color: #333333;
+            text-align: center;
+            border-left: 3px solid #FFD700;
+        }
+
+        /* Results Page */
+        .results-container {
+            text-align: center;
+        }
+        .results-header {
+            margin-bottom: 2rem;
+        }
+        .results-header h1 {
+            font-size: 2rem;
+            color: #000000;
+        }
+        .final-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .final-stat-card {
+            background: #F8F8F8;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            border: 1px solid #EEEEEE;
+        }
+        .final-stat-card h3 {
+            color: #666666;
+            font-size: 0.9rem;
+        }
+        .final-stat-card div {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #000000;
+        }
+        .leader-rating {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            color: #FFD700;
+            text-shadow: 1px 1px 0px #000000;
+        }
+        .feedback-summary {
+            background: #F8F8F8;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+            border-left: 5px solid #FFD700;
+        }
+        .play-again-btn {
+            margin-top: 1rem;
+        }
+        .game-header h2 {
+            color: #000000;
+        }
+        .game-header p {
+            color: #666666;
+        }
+    </style>
+</head>
+<body>
+    <!-- RULES SCREEN -->
+    <div id="rulesScreen" class="screen">
+        <div class="rules-container">
+            <div class="rules-header">
+                <h1>⚫ TEAM BUILDER SIMULATOR ⚪</h1>
+                <p style="color:#666666;">Master the Art of Leadership Through Team Building</p>
+            </div>
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-icon">👥</div>
+                    <div class="rule-title">Recruit Diverse Talent</div>
+                    <div class="rule-text">Choose from 10 unique candidates with different traits, specialties, and backstories. Each brings unique bonuses to your team's performance.</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">📊</div>
+                    <div class="rule-title">5 Leadership Metrics</div>
+                    <div class="rule-text">Your team affects: SYNERGY, INNOVATION, TRUST, RESILIENCE, PRODUCTIVITY. Keep them high to succeed!</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">🎯</div>
+                    <div class="rule-title">Team Size Limit</div>
+                    <div class="rule-text">Maximum 5 team members. Choose wisely — diversity and complementary skills boost your stats.</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">🤝</div>
+                    <div class="rule-title">Leadership Actions</div>
+                    <div class="rule-text">Use TEAM MEETING (boosts Synergy & Trust) and MENTORSHIP (boosts Resilience & Innovation) to grow your leadership.</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">🏆</div>
+                    <div class="rule-title">Win Condition</div>
+                    <div class="rule-text">Build a team of 5 members and use leadership actions to maximize all 5 metrics. Click "FINISH JOURNEY" when ready to see your final leadership rating!</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">🔄</div>
+                    <div class="rule-title">Remove & Replace</div>
+                    <div class="rule-text">You can remove members anytime to try different combinations. Experiment to find the perfect team synergy.</div>
+                </div>
+            </div>
+            <button class="btn-primary start-btn" id="startGameBtn">🚀 START YOUR LEADERSHIP JOURNEY →</button>
+        </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="gameScreen" class="screen hidden">
+        <div class="game-header" style="text-align:center; margin-bottom:1rem;">
+            <h2 style="color:#000000;">👑 BUILD YOUR DREAM TEAM</h2>
+            <p style="color:#666666;">Recruit 5 members | Use Actions | Click FINISH when ready</p>
+        </div>
+
+        <div class="leader-dashboard">
+            <div class="leader-stat"><div class="leader-stat-label">🎯 SYNERGY</div><div class="leader-stat-value" id="synergyVal">65</div><div class="leader-stat-bar"><div class="leader-stat-fill" id="synergyFill"></div></div></div>
+            <div class="leader-stat"><div class="leader-stat-label">💡 INNOVATION</div><div class="leader-stat-value" id="innovationVal">60</div><div class="leader-stat-bar"><div class="leader-stat-fill" id="innovationFill"></div></div></div>
+            <div class="leader-stat"><div class="leader-stat-label">🤝 TRUST</div><div class="leader-stat-value" id="trustVal">70</div><div class="leader-stat-bar"><div class="leader-stat-fill" id="trustFill"></div></div></div>
+            <div class="leader-stat"><div class="leader-stat-label">⚡ RESILIENCE</div><div class="leader-stat-value" id="resilienceVal">65</div><div class="leader-stat-bar"><div class="leader-stat-fill" id="resilienceFill"></div></div></div>
+            <div class="leader-stat"><div class="leader-stat-label">📈 PRODUCTIVITY</div><div class="leader-stat-value" id="productivityVal">68</div><div class="leader-stat-bar"><div class="leader-stat-fill" id="productivityFill"></div></div></div>
+        </div>
+
+        <div class="game-grid">
+            <div class="team-section">
+                <div class="section-title">👥 YOUR TEAM <span id="teamCount">(0/5 members)</span></div>
+                <div id="rosterContainer" class="roster-grid"><div style="color:#999999; text-align:center; padding:2rem;">No team members yet. Recruit from candidates!</div></div>
+                <div class="action-panel">
+                    <div class="action-buttons">
+                        <button class="action-btn" id="teamMeetingBtn">🤝 TEAM MEETING</button>
+                        <button class="action-btn" id="mentorshipBtn">🌟 MENTORSHIP</button>
+                        <button class="action-btn reset-btn" id="resetGameBtn">🔄 RESET</button>
+                        <button class="action-btn finish-btn" id="finishGameBtn">🏁 FINISH JOURNEY</button>
+                    </div>
+                    <div id="eventFeedback" class="event-feedback">✨ Click on candidates to recruit. Lead your team to greatness!</div>
+                </div>
+            </div>
+            <div class="candidates-section">
+                <div class="section-title">🌟 AVAILABLE CANDIDATES</div>
+                <div id="candidatesContainer" class="candidates-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div id="resultsScreen" class="screen hidden">
+        <div class="results-container">
+            <div class="results-header">
+                <h1>🏆 LEADERSHIP EVALUATION</h1>
+                <p style="color:#666666;">Your journey as a team builder is complete</p>
+            </div>
+            <div class="final-stats" id="finalStatsContainer"></div>
+            <div class="leader-rating" id="ratingText"></div>
+            <div class="feedback-summary" id="detailedFeedback"></div>
+            <button class="btn-primary play-again-btn" id="playAgainBtn">🔄 PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <script>
+        // CANDIDATES DATA
+        const candidatesPool = [
+            { id: 0, name: "Aisha Chen", role: "Creative Director", traits: ["Visionary", "Empathetic", "Risk-taker"], specialty: "Innovation", synergyBonus: 5, innovationBonus: 12, trustBonus: 4, resilienceBonus: 1, productivityBonus: 2, backstory: "Award-winning designer, champions inclusive creativity" },
+            { id: 1, name: "Marcus Okafor", role: "Engineering Lead", traits: ["Analytical", "Mentor", "Detail-oriented"], specialty: "Structure", synergyBonus: 6, innovationBonus: 3, trustBonus: 7, productivityBonus: 8, resilienceBonus: 4, backstory: "Built scalable systems for global startups" },
+            { id: 2, name: "Priya Kapoor", role: "Data Strategist", traits: ["Curious", "Ethical", "Problem-solver"], specialty: "Insights", synergyBonus: 4, innovationBonus: 9, trustBonus: 5, productivityBonus: 7, resilienceBonus: 3, backstory: "Uses data to drive human-centric decisions" },
+            { id: 3, name: "Liam O'Connor", role: "Community Manager", traits: ["Charismatic", "Empathetic", "Conflict-resolver"], specialty: "Trust", synergyBonus: 10, innovationBonus: 2, trustBonus: 12, productivityBonus: 3, resilienceBonus: 5, backstory: "Built thriving communities from scratch" },
+            { id: 4, name: "Yuki Tanaka", role: "Agile Coach", traits: ["Adaptable", "Patient", "Systems-thinker"], specialty: "Resilience", synergyBonus: 7, innovationBonus: 4, trustBonus: 6, productivityBonus: 5, resilienceBonus: 10, backstory: "Transformed toxic teams into high-performers" },
+            { id: 5, name: "Carlos Mendez", role: "Product Visionary", traits: ["Bold", "User-obsessed", "Strategic"], specialty: "Innovation", synergyBonus: 5, innovationBonus: 14, trustBonus: 2, productivityBonus: 6, resilienceBonus: 2, backstory: "Launched 3 market-leading products" },
+            { id: 6, name: "Fatima Al-Rashid", role: "Operations Expert", traits: ["Organized", "Calm-under-pressure", "Inclusive"], specialty: "Productivity", synergyBonus: 4, innovationBonus: 2, trustBonus: 6, productivityBonus: 12, resilienceBonus: 5, backstory: "Streamlined operations for NGOs worldwide" },
+            { id: 7, name: "Ethan Wright", role: "Wellness Lead", traits: ["Empathetic", "Listener", "Resilient"], specialty: "Trust & Resilience", synergyBonus: 8, innovationBonus: 1, trustBonus: 10, productivityBonus: 3, resilienceBonus: 9, backstory: "Pioneered mental health programs in tech" },
+            { id: 8, name: "Nina Kowalski", role: "Innovation Catalyst", traits: ["Curious", "Experimenter", "Collaborative"], specialty: "Innovation", synergyBonus: 6, innovationBonus: 13, trustBonus: 3, productivityBonus: 4, resilienceBonus: 4, backstory: "Led hackathons that generated patents" },
+            { id: 9, name: "David Kim", role: "Conflict Mediator", traits: ["Diplomatic", "Wise", "Calm"], specialty: "Synergy", synergyBonus: 12, innovationBonus: 2, trustBonus: 8, productivityBonus: 3, resilienceBonus: 6, backstory: "Resolved 50+ team disputes successfully" }
+        ];
+
+        let team = [];
+        let availableCandidates = [...candidatesPool];
+        let leaderStats = { synergy: 65, innovation: 60, trust: 70, resilience: 65, productivity: 68 };
+        let gameActive = true;
+
+        function clampStats() {
+            for(let key in leaderStats) {
+                if(leaderStats[key] > 100) leaderStats[key] = 100;
+                if(leaderStats[key] < 0) leaderStats[key] = 0;
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('synergyVal').innerText = leaderStats.synergy;
+            document.getElementById('innovationVal').innerText = leaderStats.innovation;
+            document.getElementById('trustVal').innerText = leaderStats.trust;
+            document.getElementById('resilienceVal').innerText = leaderStats.resilience;
+            document.getElementById('productivityVal').innerText = leaderStats.productivity;
+            document.getElementById('synergyFill').style.width = leaderStats.synergy + '%';
+            document.getElementById('innovationFill').style.width = leaderStats.innovation + '%';
+            document.getElementById('trustFill').style.width = leaderStats.trust + '%';
+            document.getElementById('resilienceFill').style.width = leaderStats.resilience + '%';
+            document.getElementById('productivityFill').style.width = leaderStats.productivity + '%';
+            document.getElementById('teamCount').innerHTML = `(${team.length}/5 members)`;
+        }
+
+        function recalcTeamStats() {
+            if (team.length === 0) {
+                leaderStats = { synergy: 65, innovation: 60, trust: 70, resilience: 65, productivity: 68 };
+                clampStats();
+                updateUI();
+                return;
+            }
+            let totalSynergy = 0, totalInnovation = 0, totalTrust = 0, totalResilience = 0, totalProductivity = 0;
+            team.forEach(m => {
+                totalSynergy += m.synergyBonus;
+                totalInnovation += m.innovationBonus;
+                totalTrust += m.trustBonus;
+                totalResilience += m.resilienceBonus;
+                totalProductivity += m.productivityBonus;
+            });
+            let allTraits = team.flatMap(m => m.traits);
+            let uniqueTraits = new Set(allTraits);
+            let diversityBonus = Math.min(15, uniqueTraits.size * 1.5);
+            let sizeBonus = team.length * 2;
+            
+            leaderStats.synergy = Math.min(100, Math.floor(50 + totalSynergy * 0.7 + diversityBonus + sizeBonus));
+            leaderStats.innovation = Math.min(100, Math.floor(45 + totalInnovation * 0.8 + (uniqueTraits.has("Risk-taker") ? 5 : 0) + (team.length >= 3 ? 4 : 0)));
+            leaderStats.trust = Math.min(100, Math.floor(55 + totalTrust * 0.7 + (team.some(m => m.specialty.includes("Trust")) ? 6 : 0)));
+            leaderStats.resilience = Math.min(100, Math.floor(50 + totalResilience * 0.6 + (team.length >= 4 ? 5 : 0)));
+            leaderStats.productivity = Math.min(100, Math.floor(52 + totalProductivity * 0.7 + (team.length >= 3 ? 3 : 0)));
+            clampStats();
+            updateUI();
+        }
+
+        function showFeedback(msg) {
+            const fbDiv = document.getElementById('eventFeedback');
+            if(fbDiv) {
+                fbDiv.innerHTML = `💬 ${msg}`;
+                setTimeout(() => { if(document.getElementById('eventFeedback')) fbDiv.innerHTML = `✨ ${msg.substring(0,50)}...`; }, 2000);
+            }
+        }
+
+        function renderRoster() {
+            const container = document.getElementById('rosterContainer');
+            if (!container) return;
+            if (team.length === 0) { container.innerHTML = '<div style="color:#999999; text-align:center; padding:2rem;">✨ No team members yet. Recruit diverse talent!</div>'; return; }
+            container.innerHTML = team.map((member, idx) => `
+                <div class="team-card">
+                    <div style="display:flex; justify-content:space-between;"><span class="member-name">${member.name}</span><span class="member-role">${member.role}</span></div>
+                    <div class="member-traits">${member.traits.map(t => `<span class="trait">${t}</span>`).join('')}</div>
+                    <button class="remove-btn" data-idx="${idx}">❌ Remove</button>
+                </div>
+            `).join('');
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(btn.dataset.idx);
+                    if (!isNaN(idx) && team[idx]) {
+                        const removed = team.splice(idx, 1)[0];
+                        availableCandidates.push(removed);
+                        availableCandidates.sort((a,b) => a.id - b.id);
+                        renderCandidates();
+                        renderRoster();
+                        recalcTeamStats();
+                        showFeedback(`Removed ${removed.name}. They return to candidates.`);
+                    }
+                });
+            });
+        }
+
+        function renderCandidates() {
+            const container = document.getElementById('candidatesContainer');
+            if (!container) return;
+            if (availableCandidates.length === 0) { container.innerHTML = '<div style="text-align:center; padding:2rem; color:#FFD700; font-weight:bold;">🌟 All candidates recruited!</div>'; return; }
+            container.innerHTML = availableCandidates.map(c => `
+                <div class="candidate-card">
+                    <div style="display:flex; justify-content:space-between;"><strong style="color:#000000;">${c.name}</strong> <span style="font-size:0.7rem; color:#666666;">${c.role}</span></div>
+                    <div class="member-traits">${c.traits.map(t => `<span class="trait">${t}</span>`).join('')}</div>
+                    <button class="recruit-btn" data-id="${c.id}">➕ RECRUIT</button>
+                </div>
+            `).join('');
+            document.querySelectorAll('.recruit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(btn.dataset.id);
+                    const candidate = availableCandidates.find(c => c.id === id);
+                    if (candidate && team.length < 5) {
+                        team.push({...candidate});
+                        availableCandidates = availableCandidates.filter(c => c.id !== id);
+                        renderCandidates();
+                        renderRoster();
+                        recalcTeamStats();
+                        showFeedback(`🎉 ${candidate.name} joined! ${candidate.specialty} expert added.`);
+                    } else if (team.length >= 5) showFeedback("⚠️ Team is full! Remove a member first.");
+                });
+            });
+        }
+
+        function teamMeeting() {
+            if (team.length === 0) { showFeedback("⚠️ No team members to meet with!"); return; }
+            leaderStats.synergy = Math.min(100, leaderStats.synergy + 5 + Math.floor(team.length * 1.2));
+            leaderStats.trust = Math.min(100, leaderStats.trust + 6);
+            leaderStats.productivity = Math.min(100, leaderStats.productivity + 2);
+            clampStats(); updateUI(); recalcTeamStats();
+            showFeedback(`🤝 Team Meeting! Synergy ↑, Trust ↑. Team feels connected.`);
+        }
+
+        function mentorshipSession() {
+            if (team.length === 0) { showFeedback("⚠️ No team to mentor!"); return; }
+            leaderStats.resilience = Math.min(100, leaderStats.resilience + 7);
+            leaderStats.innovation = Math.min(100, leaderStats.innovation + 6);
+            leaderStats.trust = Math.min(100, leaderStats.trust + 3);
+            clampStats(); updateUI(); recalcTeamStats();
+            showFeedback(`🌟 Mentorship Session! Resilience ↑, Innovation ↑.`);
+        }
+
+        function finishGame() {
+            gameActive = false;
+            document.getElementById('gameScreen').classList.add('hidden');
+            showResults();
+        }
+
+        function showResults() {
+            const avg = (leaderStats.synergy + leaderStats.innovation + leaderStats.trust + leaderStats.resilience + leaderStats.productivity) / 5;
+            let rating = "", description = "";
+            if (avg >= 85) { rating = "🏅 LEGENDARY LEADER"; description = "You've built an exceptional team and demonstrated masterful leadership. Your ability to balance diverse talents, foster trust, and drive innovation sets a benchmark. Teams would follow you anywhere!"; }
+            else if (avg >= 70) { rating = "🌟 INSPIRING LEADER"; description = "Great work! Your team thrives under your guidance. You understand the core of leadership: empowering others while maintaining vision. Keep growing!"; }
+            else if (avg >= 55) { rating = "📈 CAPABLE MANAGER"; description = "Solid foundation! You're building leadership skills. Focus on deepening trust and embracing more mentorship to unlock higher synergy."; }
+            else { rating = "🌱 ASPIRING LEADER"; description = "Your journey has begun. Leadership is a practice — keep experimenting with team composition and leadership actions to unlock greater potential."; }
+            
+            const finalContainer = document.getElementById('finalStatsContainer');
+            finalContainer.innerHTML = `
+                <div class="final-stat-card"><h3>🎯 Synergy</h3><div>${leaderStats.synergy}</div></div>
+                <div class="final-stat-card"><h3>💡 Innovation</h3><div>${leaderStats.innovation}</div></div>
+                <div class="final-stat-card"><h3>🤝 Trust</h3><div>${leaderStats.trust}</div></div>
+                <div class="final-stat-card"><h3>⚡ Resilience</h3><div>${leaderStats.resilience}</div></div>
+                <div class="final-stat-card"><h3>📈 Productivity</h3><div>${leaderStats.productivity}</div></div>
+            `;
+            document.getElementById('ratingText').innerHTML = `${rating}<br><span style="font-size:1rem; color:#666666;">Overall Score: ${Math.floor(avg)}/100</span>`;
+            document.getElementById('detailedFeedback').innerHTML = `
+                <strong>📊 TEAM COMPOSITION:</strong> ${team.length} members recruited.<br>
+                <strong>🏆 LEADERSHIP INSIGHT:</strong> ${description}<br><br>
+                <strong>💡 Key Leadership Qualities Demonstrated:</strong><br>
+                • ${leaderStats.trust > 70 ? "High Trust — psychological safety established" : "Trust building is your next frontier"}<br>
+                • ${leaderStats.innovation > 70 ? "Innovation mindset — you embrace change" : "Encourage more creative risk-taking"}<br>
+                • ${leaderStats.synergy > 70 ? "Excellent synergy — diversity leveraged" : "Work on team cohesion exercises"}<br>
+            `;
+            document.getElementById('resultsScreen').classList.remove('hidden');
+        }
+
+        function resetGame() {
+            team = [];
+            availableCandidates = [...candidatesPool];
+            leaderStats = { synergy: 65, innovation: 60, trust: 70, resilience: 65, productivity: 68 };
+            gameActive = true;
+            clampStats();
+            renderCandidates();
+            renderRoster();
+            recalcTeamStats();
+            showFeedback("Game reset! Start building your dream team.");
+        }
+
+        // Navigation
+        document.getElementById('startGameBtn').addEventListener('click', () => {
+            document.getElementById('rulesScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            resetGame();
+        });
+        document.getElementById('finishGameBtn').addEventListener('click', finishGame);
+        document.getElementById('teamMeetingBtn').addEventListener('click', teamMeeting);
+        document.getElementById('mentorshipBtn').addEventListener('click', mentorshipSession);
+        document.getElementById('resetGameBtn').addEventListener('click', resetGame);
+        document.getElementById('playAgainBtn').addEventListener('click', () => {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('rulesScreen').classList.remove('hidden');
+            resetGame();
+        });
+
+        // Initial render for game
+        renderCandidates();
+        renderRoster();
+        recalcTeamStats();
+    </script>
+</body>
+</html>
